@@ -1,0 +1,15 @@
+.colorPicker {
+  border: 1px solid #000;
+  width: 15px;
+  height: 15px;
+  margin: 0 10px 0 0;
+}
+
+.colorPicker:hover, .colorPicker:focus,
+.delete:hover, .delete:focus {
+  cursor: pointer;
+}
+
+.delete {
+  color: red;
+}
