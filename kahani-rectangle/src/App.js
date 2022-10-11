@@ -1,5 +1,6 @@
 import logo from './logo.svg';
-import Canvas from './Rectangles/Canvas.tsx';
+import Scene from './components/Scene';
+
 import './App.css';
 
 function App() {
@@ -9,7 +10,7 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
         <h1>Kahani Rectangles</h1>
       </header>
-      <Canvas />
+      <Scene />
     </div>
   );
 }
