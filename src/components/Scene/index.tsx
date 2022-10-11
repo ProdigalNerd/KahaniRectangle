@@ -12,6 +12,12 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 import './Scene.css';
 
 interface SceneProps {
@@ -29,6 +35,12 @@ interface SceneProps {
   onSave(): void,
   layoutName: string,
   setLayoutName: Dispatch<SetStateAction<string>>,
+  showSavedLayouts: boolean,
+  setShowSavedLayouts: Dispatch<SetStateAction<boolean>>,
+  openSavedLayoutsDialog(): void,
+  savedLayouts: string[],
+  openLayout(selectedLayout: string): void,
+  deleteLayout(layout: string): void,
 }
 
 const View: FC<SceneProps> = ({
@@ -45,12 +57,19 @@ const View: FC<SceneProps> = ({
   closeSave,
   onSave,
   layoutName,
-  setLayoutName
+  setLayoutName,
+  setShowSavedLayouts,
+  showSavedLayouts,
+  openSavedLayoutsDialog,
+  savedLayouts,
+  openLayout,
+  deleteLayout,
 }) => (
   <>
     <div className="controls">
       <Button onClick={addRectangle} variant="contained">Add Rectangle</Button>
       <Button onClick={saveLayout} variant="contained">Save Layout</Button>
+      <Button onClick={openSavedLayoutsDialog} variant="contained">View Layouts</Button>
       <Button onClick={clearRectangles} variant="outlined">Clear</Button>
     </div>
     <Dialog open={openSave}>
@@ -76,6 +95,32 @@ const View: FC<SceneProps> = ({
           <Button onClick={onSave}>Save</Button>
         </DialogActions>
     </Dialog>
+
+    <Dialog onClose={() => setShowSavedLayouts(false)} open={showSavedLayouts}>
+      <DialogTitle>Select A Layout</DialogTitle>
+      <List sx={{ pt: 0 }}>
+        {savedLayouts.map((layout) => (
+          <ListItem
+            key={layout}
+            secondaryAction={
+              <IconButton
+                edge="end"
+                aria-label="delete"
+                onClick={() => deleteLayout(layout)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            }
+          >
+            <ListItemText onClick={() => openLayout(layout)} primary={layout} />
+          </ListItem>
+        ))}
+      </List>
+      <DialogActions>
+        <Button onClick={() => setShowSavedLayouts(false)}>Cancel</Button>
+      </DialogActions>
+    </Dialog>
+
     <Stage
       width={window.innerWidth}
       height={window.innerHeight}
@@ -102,6 +147,8 @@ const Scene: FC = () => {
   const [shapes, setShapes] = useState<RectDef[]>([]);
   const [counter, setCounter] = useState(0);
   const [openSave, setOpenSave] = useState(false);
+  const [savedLayouts, setSavedLayouts] = useState([] as string[]);
+  const [showSavedLayouts, setShowSavedLayouts] = useState(false);
   const [layoutName, setLayoutName] = useState('');
   const [selectedRect, setSelectedRect] = useState(null);
 
@@ -158,6 +205,28 @@ const Scene: FC = () => {
     },
     layoutName,
     setLayoutName,
+    showSavedLayouts,
+    setShowSavedLayouts,
+    openSavedLayoutsDialog: () => {
+      setSavedLayouts(Object.keys(localStorage));
+      setShowSavedLayouts(true);
+    },
+    savedLayouts,
+    openLayout: (selectedLayout) => {
+      const layoutString = window.localStorage.getItem(selectedLayout);
+      if (!layoutString) return;
+
+      const layout = JSON.parse(layoutString) as RectDef[];
+      setShapes(layout);
+      setShowSavedLayouts(false);
+    },
+    deleteLayout: (layout) => {
+      localStorage.removeItem(layout);
+
+      if (Object.keys(localStorage).length === 0) setShowSavedLayouts(false);
+
+      setSavedLayouts(Object.keys(localStorage));
+    },
   };
 
   return (
