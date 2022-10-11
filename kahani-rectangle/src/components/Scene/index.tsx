@@ -1,54 +1,53 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Stage, Layer, Rect } from 'react-konva';
-
-type RectDef = {
-  key: number,
-  x: number,
-  y: number,
-  fill: string,
-  width: number,
-  height: number,
-  draggable: boolean,
-  onDragend(): void,
-}
+import { Stage, Layer } from 'react-konva';
+import { RectDef } from '../../interfaces/RectDef';
+import Rectangle from '../Rectangle';
+import Button from '@mui/material/Button';
+import './Scene.css';
 
 interface SceneProps {
-  shapes: Array<RectDef>
+  shapes: Array<RectDef>,
+  addRectangle(): void,
 }
 
-const View: FC<SceneProps> = ({ shapes }) => (
-  <Stage width={window.innerWidth} height={window.innerHeight}>
-    <Layer>
-      {shapes.map((shape) => (
-        <Rect {...shape} />
-      ))}
-    </Layer>
-  </Stage>
+const View: FC<SceneProps> = ({ shapes, addRectangle }) => (
+  <>
+    <div className="controls">
+      <Button onClick={addRectangle} variant="contained">Add Rectangle</Button>
+    </div>
+    <Stage width={window.innerWidth} height={window.innerHeight}>
+      <Layer>
+        {shapes.map((shape) => (
+          <Rectangle key={shape.key} shape={shape} />
+        ))}
+      </Layer>
+    </Stage>
+  </>
 );
 
 const Scene: FC = () => {
   const [shapes, setShapes] = useState<RectDef[]>([]);
   const colors = ['blue', 'black', 'red', 'green', 'yellow'];
-  console.log('hit');
 
-  useEffect(() => {
-    setShapes([
-      {
-        key: 0,
-        x: 100,
-        y: 100,
-        width: 200,
-        height: 100,
-        fill: colors[0],
-        draggable: true,
-        onDragend: () => {}
-      } as RectDef
-    ]);
-    /* eslint-disable-next-line */
-  }, [setShapes]);
+  const hookProps = {
+    addRectangle: () => {
+      setShapes([
+        ...shapes,
+        {
+          key: shapes.length,
+          x: 100,
+          y: 100,
+          width: 200,
+          height: 100,
+          fill: colors[Math.round(Math.random() * colors.length)],
+          draggable: true,
+        }
+      ])
+    },
+  };
 
   return (
-    <View shapes={shapes} />
+    <View shapes={shapes} {...hookProps} />
   );
 };
 
