@@ -49,7 +49,7 @@ const View: FC<SceneProps> = ({
   <>
     <div className="controls">
       <Button onClick={addRectangle} variant="contained">Add Rectangle</Button>
-      <Button onClick={() => setOpenSave(true)} variant="contained">Save Layout</Button>
+      <Button onClick={() => setOpenSave(true)} variant="contained" disabled={shapes.length === 0}>Save Layout</Button>
       <Button onClick={() => setShowSavedLayouts(true)} variant="contained">View Layouts</Button>
       <Button onClick={clearRectangles} variant="outlined">Clear</Button>
     </div>

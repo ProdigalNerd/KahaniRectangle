@@ -7,7 +7,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 
-const View = ({ openSave, layoutName, setLayoutName, closeSave, onSave }) => (
+const View = ({ openSave, layoutName, setLayoutName, closeSave, onSave, hasError }) => (
   <Dialog open={openSave}>
     <DialogTitle>Save Layout</DialogTitle>
       <DialogContent>
@@ -23,6 +23,8 @@ const View = ({ openSave, layoutName, setLayoutName, closeSave, onSave }) => (
           fullWidth
           variant="standard"
           value={layoutName}
+          error={hasError}
+          helperText="Please enter a name"
           onChange={(e) => setLayoutName(e.target.value)}
         />
       </DialogContent>
@@ -35,16 +37,23 @@ const View = ({ openSave, layoutName, setLayoutName, closeSave, onSave }) => (
 
 const SaveDialog = ({ closeSave, shapes, ...props }) => {
   const [layoutName, setLayoutName] = useState('');
+  const [hasError, setHasError] = useState(false);
 
   const hookProps = {
     layoutName,
     setLayoutName,
     onSave: () => {
+      if (!layoutName) {
+        setHasError(true);
+        return;
+      }
       window.localStorage.setItem(layoutName, JSON.stringify(shapes));
       setLayoutName('');
+      setHasError(false);
       closeSave();
     },
     closeSave,
+    hasError,
   }
 
   return (
